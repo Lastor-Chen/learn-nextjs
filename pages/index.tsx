@@ -1,5 +1,6 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
+import Link from 'next/link'
 import css from 'styled-jsx/css'
 
 // External CSS test
@@ -11,6 +12,8 @@ const myButton = css`
   }
 `
 
+console.log('index init')
+
 const Home: NextPage = function() {
   return (
     <div className="container">
@@ -21,7 +24,10 @@ const Home: NextPage = function() {
 
       <main>
         <h1 className="title">
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
+          {'Read '}
+          <Link href="/posts/first-post">
+            <a>this page!</a>
+          </Link>
         </h1>
 
         <button>Test</button>
