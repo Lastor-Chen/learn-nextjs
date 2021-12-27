@@ -1,5 +1,15 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
+import css from 'styled-jsx/css'
+
+// External CSS test
+const myButton = css`
+  main {
+    button {
+      color: red;
+    }
+  }
+`
 
 const Home: NextPage = function() {
   return (
@@ -13,6 +23,8 @@ const Home: NextPage = function() {
         <h1 className="title">
           Welcome to <a href="https://nextjs.org">Next.js!</a>
         </h1>
+
+        <button>Test</button>
 
         <p className="description">
           Get started by editing <code>pages/index.js</code>
@@ -60,6 +72,8 @@ const Home: NextPage = function() {
         </a>
       </footer>
 
+      <style jsx>{myButton}</style>
+
       <style jsx>{`
         .container {
           min-height: 100vh;
@@ -86,16 +100,17 @@ const Home: NextPage = function() {
           display: flex;
           justify-content: center;
           align-items: center;
-        }
 
-        footer img {
-          margin-left: 0.5rem;
-        }
+          img {
+            margin-left: 0.5rem;
+          }
 
-        footer a {
-          display: flex;
-          justify-content: center;
-          align-items: center;
+          a {
+            color: blue;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          }
         }
 
         a {
