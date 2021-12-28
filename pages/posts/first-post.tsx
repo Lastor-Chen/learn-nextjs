@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Head from 'next/head'
 import Image from 'next/image'
+import Layout from '@components/layout'
 
 console.log('firstPost init')
 
@@ -17,7 +18,7 @@ const FirstPost: NextPage = function() {
   })
 
   return (
-    <>
+    <Layout>
       <Head>
         <title>First Post</title>
       </Head>
@@ -37,7 +38,7 @@ const FirstPost: NextPage = function() {
           <a>Back to home</a>
         </Link>
       </h2>
-    </>
+    </Layout>
   )
 }
 
