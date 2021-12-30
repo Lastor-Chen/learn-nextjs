@@ -14,7 +14,7 @@ const name = 'Name'
 export const siteTitle = 'Next.js Sample Website'
 
 const Layout: NextPage<LayoutProps> = function ({ children, isHome }) {
-  console.log('isHome', isHome)
+  console.log('Layout isHome', isHome ?? false)
   return (
     <div className={`${style.layout}`}>
       <Head>

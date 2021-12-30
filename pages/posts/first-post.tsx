@@ -1,11 +1,11 @@
-import type { NextPage } from 'next'
+import type { NextPage, GetStaticProps } from 'next'
 import { useState, useEffect } from 'react'
 import Head from 'next/head'
 import Layout from '@components/layout'
 
-console.log('firstPost init')
+console.log('run firstPost.tsx')
 
-const FirstPost: NextPage = function() {
+const FirstPost: NextPage = function () {
   const [isClicked, setIsClicked] = useState(false)
   console.log('\ninvoke FirstPost')
   console.log('isClicked:', isClicked)
@@ -23,9 +23,10 @@ const FirstPost: NextPage = function() {
 
       <h1>First Post</h1>
       <div className="mb-3 text-center">
-        <button className='btn btn-primary' onClick={() => setIsClicked(!isClicked)}>Click</button>
+        <button className="btn btn-primary" onClick={() => setIsClicked(!isClicked)}>
+          Click
+        </button>
       </div>
-
     </Layout>
   )
 }
