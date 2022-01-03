@@ -1,8 +1,9 @@
 import fs from 'fs'
 import path from 'path'
 import matter from 'gray-matter'
+import type { ParsedUrlQuery } from 'querystring'
 
-const postsDirectory = path.join(process.cwd(), 'posts')
+const postsDir = path.join(process.cwd(), 'posts')
 
 /** YAML front matter from md file */
 type PostMatter = {
@@ -10,26 +11,16 @@ type PostMatter = {
   date: string
 }
 
-type PostData = PostMatter & { id: string }
+export type PostData = PostMatter & { id: string }
+export type AllPostsData = Array<PostData>
 
-export type AllPostData = Array<PostData>
-
-export const getSortedPostsData = function () {
-  const fileNames = fs.readdirSync(postsDirectory)
+function getSortedPostsData() {
+  const fileNames = fs.readdirSync(postsDir)
 
   const allPostsData = fileNames.map((fileName) => {
     // Remove ".md" from fileName
     const id = fileName.replace(/\.md$/, '')
-
-    // Read markdown file
-    const fullPath = path.join(postsDirectory, fileName)
-    const md = fs.readFileSync(fullPath, 'utf8')
-
-    // Parse metadata section
-    const matterResult = matter(md)
-    const matterData = <PostMatter>matterResult.data
-
-    return { id, ...matterData }
+    return getPostData(id)
   })
 
   // Sort by date DESC
@@ -39,3 +30,33 @@ export const getSortedPostsData = function () {
     return 0
   })
 }
+
+export interface PostId extends ParsedUrlQuery { id: string }
+interface GetAllPostIdsResult { params: PostId }
+
+function getAllPostIds() {
+  const fileNames = fs.readdirSync(postsDir)
+
+  // 避免在 getStaticPaths 重作迴圈, 在這直接配合 GetStaticPaths 的規範
+  // 將其包裝在 params 底下
+  return fileNames.map((name): GetAllPostIdsResult => ({
+    params: {
+      id: name.replace(/\.md$/, ''),
+    },
+  }))
+}
+
+getAllPostIds()[0]
+
+function getPostData(id: string): PostData {
+  // Read markdown file
+  const fullPath = path.join(postsDir, `${id}.md`)
+  const md = fs.readFileSync(fullPath, 'utf8')
+
+  // Parse metadata section
+  const matterData = <PostMatter>matter(md).data
+
+  return { id, ...matterData }
+}
+
+export { getSortedPostsData, getAllPostIds, getPostData }

@@ -1,19 +1,23 @@
-import type { NextPage, GetStaticProps } from 'next'
+import type { NextPage, GetStaticProps, GetStaticPropsResult } from 'next'
 import Head from 'next/head'
 import Link from 'next/link'
 import Layout, { siteTitle } from '@components/layout'
 import utilStyle from '@styles/utils.module.scss'
 import { getSortedPostsData } from '@lib/posts'
-import type { AllPostData } from '@lib/posts'
+import type { AllPostsData } from '@lib/posts'
 
 interface HomeStaticProps {
-  allPostsData: AllPostData
+  allPostsData: AllPostsData
 }
 
-export const getStaticProps: GetStaticProps<HomeStaticProps> = function (context) {
+// Next 的 GetStaticProps 的 props 有問題, 要用 GetStaticPropsResult 才能限制回傳 props
+export const getStaticProps: GetStaticProps = function (): GetStaticPropsResult<HomeStaticProps> {
   const allPostsData = getSortedPostsData()
+
   return {
-    props: { allPostsData }
+    props: {
+      allPostsData,
+    },
   }
 }
 
@@ -35,16 +39,14 @@ const Home: NextPage<HomeStaticProps> = function(props) {
         </p>
       </section>
 
-      <Link href="/posts/first-post">
-        <a className="d-block text-center mb-3">go to first-post</a>
-      </Link>
-
       <section className={`${utilStyle.headingMd} ${utilStyle.padding1px}`}>
         <h2 className={utilStyle.headingLg}>Blog</h2>
         <ul className={utilStyle.list}>
           {allPostsData.map((post) => (
             <li className={utilStyle.listItem} key={post.id}>
-              {post.title}
+              <Link href={`/posts/${post.id}`}>
+                <a href="">{post.title}</a>
+              </Link>
               <br />
               {post.id}
               <br />
