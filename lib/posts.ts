@@ -11,7 +11,11 @@ type PostMatter = {
   date: string
 }
 
-export type PostData = PostMatter & { id: string }
+export interface PostData extends PostMatter {
+  id: string
+  content: string
+}
+// export type PostData = PostMatter & { id: string }
 export type AllPostsData = Array<PostData>
 
 function getSortedPostsData() {
@@ -20,7 +24,18 @@ function getSortedPostsData() {
   const allPostsData = fileNames.map((fileName) => {
     // Remove ".md" from fileName
     const id = fileName.replace(/\.md$/, '')
-    return getPostData(id)
+
+    // Read markdown file
+    const fullPath = path.join(postsDir, `${id}.md`)
+    const md = fs.readFileSync(fullPath, 'utf8')
+
+    // Parse metadata section
+    const matterResult = matter(md)
+
+    return {
+      id,
+      ...<PostMatter>matterResult.data,
+    }
   })
 
   // Sort by date DESC
@@ -46,17 +61,19 @@ function getAllPostIds() {
   }))
 }
 
-getAllPostIds()[0]
-
-function getPostData(id: string): PostData {
+async function getPostData(id: string): Promise<PostData> {
   // Read markdown file
   const fullPath = path.join(postsDir, `${id}.md`)
   const md = fs.readFileSync(fullPath, 'utf8')
 
   // Parse metadata section
-  const matterData = <PostMatter>matter(md).data
+  const matterResult = matter(md)
 
-  return { id, ...matterData }
+  return {
+    id,
+    content: matterResult.content,
+    ...<PostMatter>matterResult.data,
+  }
 }
 
 export { getSortedPostsData, getAllPostIds, getPostData }

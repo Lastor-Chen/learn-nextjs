@@ -1,38 +1,19 @@
-import type { NextPage, GetStaticPaths, GetStaticProps, GetStaticPropsResult, GetStaticPathsResult } from 'next'
-import { useState, useEffect } from 'react'
+import type { NextPage, GetStaticPaths, GetStaticProps, GetStaticPropsResult, GetStaticPathsResult, GetStaticPropsContext } from 'next'
+import { useState } from 'react'
 import Head from 'next/head'
 import Layout from '@components/layout'
 import { getAllPostIds, getPostData } from '@lib/posts'
 import type { PostId, PostData } from '@lib/posts'
+import Markdown from 'markdown-to-jsx'
 
-const getStaticPaths: GetStaticPaths = async function (): Promise<GetStaticPathsResult<PostId>> {
-  // TS 需事先整理好 type 格式
-  // 使其符合 GetStaticPathsResult['paths']
-  const paths = getAllPostIds()
-
-  return {
-    paths: paths,
-    fallback: false,
-  }
-}
-
-type PostStaticProps = {
+interface PostStaticProps {
   postData: PostData
 }
 
-// Next 的 GetStaticProps 的 props 有問題, 要用 GetStaticPropsResult 才能限制回傳 props
-const getStaticProps: GetStaticProps<{}, PostId> = function (context): GetStaticPropsResult<PostStaticProps> {
-  const id = context.params!.id
-  const postData = getPostData(id)
-
-  return {
-    props: {
-      postData,
-    },
-  }
-}
-
-const Post: NextPage<PostStaticProps> = function ({ postData }) {
+// Main Page Component
+// =====================
+let Post: NextPage<PostStaticProps>
+export default Post = function ({ postData }) {
   const [isClicked, setIsClicked] = useState(false)
   console.log('isClicked:', isClicked)
 
@@ -47,14 +28,34 @@ const Post: NextPage<PostStaticProps> = function ({ postData }) {
         </button>
       </div>
 
-      {postData.title}
-      <br />
-      {postData.id}
-      <br />
-      {postData.date}
+      <h2 className='mb-1'>{postData.title}</h2>
+      <div className='mb-1'>{postData.id}</div>
+      <div className='mb-3'>{postData.date}</div>
+      <Markdown>{postData.content}</Markdown>
     </Layout>
   )
 }
 
-export default Post
-export { getStaticPaths, getStaticProps }
+// Dynamic Routes SSG
+// =====================
+export const getStaticPaths: GetStaticPaths = async function (): Promise<GetStaticPathsResult<PostId>> {
+  // TS 需事先整理好 type 格式
+  // 使其符合 GetStaticPathsResult['paths']
+  const paths = getAllPostIds()
+
+  return {
+    paths: paths,
+    fallback: false,
+  }
+}
+
+// Next 的 GetStaticProps 的 props 有問題, 要用 GetStaticPropsResult 才能限制回傳 props
+export const getStaticProps: GetStaticProps<{}, PostId> = async function (context) {
+  const postData = await getPostData(context.params!.id)
+
+  // 此 fn 的 type 定義太長了, 回傳值拆出來定義
+  const result: GetStaticPropsResult<PostStaticProps> = {
+    props: { postData },
+  }
+  return result
+}
