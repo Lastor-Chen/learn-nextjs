@@ -5,6 +5,7 @@ import Layout, { siteTitle } from '@components/layout'
 import utilStyle from '@styles/utils.module.scss'
 import { getSortedPostsData } from '@lib/posts'
 import type { PostMeta } from '@lib/posts'
+import DateFormatter from '@components/date-formatter'
 
 interface HomeStaticProps {
   allPostsData: (PostMeta & {
@@ -47,12 +48,12 @@ const Home: NextPage<HomeStaticProps> = function(props) {
           {allPostsData.map((post) => (
             <li className={utilStyle.listItem} key={post.id}>
               <Link href={`/posts/${post.id}`}>
-                <a href="">{post.title}</a>
+                <a>{post.title}</a>
               </Link>
               <br />
-              {post.id}
-              <br />
-              {post.date}
+              <small className={utilStyle.lightText}>
+                <DateFormatter dateString={post.date} />
+              </small>
             </li>
           ))}
         </ul>

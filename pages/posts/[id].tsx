@@ -6,6 +6,8 @@ import { getAllPostIds, getPostData } from '@lib/posts'
 import type { PostMeta } from '@lib/posts'
 import Markdown from 'markdown-to-jsx'
 import type { ParsedUrlQuery } from 'querystring'
+import DateFormatter from '@components/date-formatter'
+import utilStyle from '@styles/utils.module.scss'
 
 // Main Page Component
 // =====================
@@ -24,7 +26,7 @@ export default Post = function ({ postData }) {
   return (
     <Layout>
       <Head>
-        <title>Post: {postData.id}</title>
+        <title>Post - {postData.title}</title>
       </Head>
       <div className="mb-3 text-center">
         <button className="btn btn-primary" onClick={() => setIsClicked(!isClicked)}>
@@ -32,10 +34,13 @@ export default Post = function ({ postData }) {
         </button>
       </div>
 
-      <h2 className='mb-1'>{postData.title}</h2>
-      <div className='mb-1'>{postData.id}</div>
-      <div className='mb-3'>{postData.date}</div>
-      <Markdown>{postData.content!}</Markdown>
+      <article>
+        <h1 className={utilStyle.headingX1}>{postData.title}</h1>
+        <div className={`mb-3 ${utilStyle.lightText}`}>
+          <DateFormatter dateString={postData.date} />
+        </div>
+        <Markdown>{postData.content!}</Markdown>
+      </article>
     </Layout>
   )
 }

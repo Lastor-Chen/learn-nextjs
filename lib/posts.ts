@@ -8,6 +8,7 @@ const postsDir = path.join(process.cwd(), 'posts')
 /** Define Markdown metadata via YAML front matter */
 export interface PostMeta {
   title: string
+  /** ISO format */
   date: string
 }
 
