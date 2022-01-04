@@ -1,22 +1,15 @@
 import fs from 'fs'
 import path from 'path'
 import matter from 'gray-matter'
-import type { ParsedUrlQuery } from 'querystring'
+import type { GetStaticPathsResult } from 'next'
 
 const postsDir = path.join(process.cwd(), 'posts')
 
-/** YAML front matter from md file */
-type PostMatter = {
+/** Define Markdown metadata via YAML front matter */
+export interface PostMeta {
   title: string
   date: string
 }
-
-export interface PostData extends PostMatter {
-  id: string
-  content: string
-}
-// export type PostData = PostMatter & { id: string }
-export type AllPostsData = Array<PostData>
 
 function getSortedPostsData() {
   const fileNames = fs.readdirSync(postsDir)
@@ -34,7 +27,7 @@ function getSortedPostsData() {
 
     return {
       id,
-      ...<PostMatter>matterResult.data,
+      ...<PostMeta>matterResult.data,
     }
   })
 
@@ -46,22 +39,20 @@ function getSortedPostsData() {
   })
 }
 
-export interface PostId extends ParsedUrlQuery { id: string }
-interface GetAllPostIdsResult { params: PostId }
-
 function getAllPostIds() {
   const fileNames = fs.readdirSync(postsDir)
 
   // 避免在 getStaticPaths 重作迴圈, 在這直接配合 GetStaticPaths 的規範
   // 將其包裝在 params 底下
-  return fileNames.map((name): GetAllPostIdsResult => ({
+  type NextStaticPath = GetStaticPathsResult<any>['paths'][0]
+  return fileNames.map((name): NextStaticPath => ({
     params: {
       id: name.replace(/\.md$/, ''),
     },
   }))
 }
 
-async function getPostData(id: string): Promise<PostData> {
+async function getPostData(id: string) {
   // Read markdown file
   const fullPath = path.join(postsDir, `${id}.md`)
   const md = fs.readFileSync(fullPath, 'utf8')
@@ -72,7 +63,7 @@ async function getPostData(id: string): Promise<PostData> {
   return {
     id,
     content: matterResult.content,
-    ...<PostMatter>matterResult.data,
+    ...<PostMeta>matterResult.data,
   }
 }
 

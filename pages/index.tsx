@@ -4,10 +4,12 @@ import Link from 'next/link'
 import Layout, { siteTitle } from '@components/layout'
 import utilStyle from '@styles/utils.module.scss'
 import { getSortedPostsData } from '@lib/posts'
-import type { AllPostsData } from '@lib/posts'
+import type { PostMeta } from '@lib/posts'
 
 interface HomeStaticProps {
-  allPostsData: AllPostsData
+  allPostsData: (PostMeta & {
+    id: string
+  })[]
 }
 
 // Next 的 GetStaticProps 的 props 有問題, 要用 GetStaticPropsResult 才能限制回傳 props
