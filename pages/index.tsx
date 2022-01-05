@@ -52,7 +52,7 @@ const Home: NextPage<HomeStaticProps> = function(props) {
               </Link>
               <br />
               <small className={utilStyle.lightText}>
-                <DateFormatter dateString={post.date} />
+                <DateFormatter dateString={post.date!} />
               </small>
             </li>
           ))}
