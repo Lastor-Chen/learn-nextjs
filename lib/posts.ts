@@ -7,9 +7,9 @@ const postsDir = path.join(process.cwd(), 'posts')
 
 /** Define Markdown metadata via YAML front matter */
 export interface PostMeta {
-  title: string
+  title?: string
   /** ISO format */
-  date: string
+  date?: string
 }
 
 function getSortedPostsData() {
@@ -33,15 +33,25 @@ function getSortedPostsData() {
   })
 
   // Sort by date DESC
-  return allPostsData.sort(({ date: a }, { date: b }) => {
-    if (a < b) return 1
-    if (a > b) return -1
+  return allPostsData.sort((a, b) => {
+    const dateA = a.date || '0'
+    const dateB = b.date || '0'
+
+    if (dateA < dateB) return 1
+    if (dateA > dateB) return -1
     return 0
   })
 }
 
 function getAllPostIds() {
   const fileNames = fs.readdirSync(postsDir)
+
+  // fallback true 測試效果用
+  const testFileName = 'fallback-test.md'
+  if (fileNames.includes(testFileName)) {
+    const idx = fileNames.indexOf(testFileName)
+    fileNames.splice(idx, 1)
+  }
 
   // 避免在 getStaticPaths 重作迴圈, 在這直接配合 GetStaticPaths 的規範
   // 將其包裝在 params 底下
@@ -56,15 +66,23 @@ function getAllPostIds() {
 async function getPostData(id: string) {
   // Read markdown file
   const fullPath = path.join(postsDir, `${id}.md`)
-  const md = fs.readFileSync(fullPath, 'utf8')
 
-  // Parse metadata section
-  const matterResult = matter(md)
+  try {
+    const md = fs.readFileSync(fullPath, 'utf8')
 
-  return {
-    id,
-    content: matterResult.content,
-    ...<PostMeta>matterResult.data,
+    // Parse metadata section
+    const matterResult = matter(md)
+
+    return {
+      id,
+      content: matterResult.content,
+      ...<PostMeta>matterResult.data,
+    }
+  } catch (e) {
+    return {
+      id,
+      content: '',
+    }
   }
 }
 

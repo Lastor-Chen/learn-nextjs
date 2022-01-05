@@ -1,5 +1,6 @@
 import type { NextPage, GetStaticPaths, GetStaticProps, GetStaticPropsResult, GetStaticPathsResult } from 'next'
-import { useState } from 'react'
+import { useRouter } from 'next/router'
+import { useState, PropsWithChildren, MouseEventHandler } from 'react'
 import Head from 'next/head'
 import Layout from '@components/layout'
 import { getAllPostIds, getPostData } from '@lib/posts'
@@ -20,28 +21,61 @@ interface PostStaticProps {
 
 let Post: NextPage<PostStaticProps>
 export default Post = function ({ postData }) {
+  const router = useRouter()
+
+  // 即使 fallback, useState 也需優先定義
   const [isClicked, setIsClicked] = useState(false)
   console.log('isClicked:', isClicked)
 
+  const clickStateBtn = () => setIsClicked(!isClicked)
+
+  // 當 getStaticPaths 的 fallback 設定為 true,
+  // 請求未被靜態生成的檔案時, 可先回傳 fallback 頁面
+  // 等 Server 即時生成後, 再換成主內容
+  if (router.isFallback) {
+    return (
+      <Layout>
+        <StateBtn onClick={clickStateBtn} />
+        <article>
+          <h1 className={utilStyle.headingX1}>Loading</h1>
+        </article>
+      </Layout>
+    )
+  }
+
+  const title = postData.title ?? 'Not Found'
   return (
     <Layout>
       <Head>
-        <title>Post - {postData.title}</title>
+        <title>Post - {title}</title>
       </Head>
-      <div className="mb-3 text-center">
-        <button className="btn btn-primary" onClick={() => setIsClicked(!isClicked)}>
-          Click
-        </button>
-      </div>
+
+      <StateBtn onClick={clickStateBtn} />
 
       <article>
-        <h1 className={utilStyle.headingX1}>{postData.title}</h1>
+        <h1 className={utilStyle.headingX1}>{title}</h1>
         <div className={`mb-3 ${utilStyle.lightText}`}>
-          <DateFormatter dateString={postData.date} />
+          {!postData.date ? null : (
+            <DateFormatter dateString={postData.date} />
+          )}
         </div>
         <Markdown>{postData.content!}</Markdown>
       </article>
     </Layout>
+  )
+}
+
+interface StateBtnProps {
+  onClick: MouseEventHandler<HTMLButtonElement>
+}
+
+function StateBtn(props: PropsWithChildren<StateBtnProps>) {
+  return (
+    <div className="mb-3 text-center">
+      <button className="btn btn-primary" onClick={props.onClick}>
+        Click
+      </button>
+    </div>
   )
 }
 
@@ -58,7 +92,7 @@ export const getStaticPaths: GetStaticPaths = async function (): Promise<GetStat
 
   return {
     paths: paths,
-    fallback: false,
+    fallback: true,
   }
 }
 
