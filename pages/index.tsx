@@ -34,7 +34,7 @@ const Home: NextPage<HomeStaticProps> = function(props) {
       </Head>
 
       <section className={`${utilStyle.headingMd} ${utilStyle.bottomBorder}`}>
-        <p>{'自我介紹...(略'}</p>
+        <p>{'自我介紹...哈哈哈(略'}</p>
         <p>
           {"(This is a sample website - you'll be building a site like this on "}
           <a href="https://nextjs.org/learn">our Next.js tutorial</a>
